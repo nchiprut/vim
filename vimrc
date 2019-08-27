@@ -55,7 +55,15 @@ colorscheme gruvbox
 nmap  <C-Left> :bprevious<CR>
 nmap <C-Right>   :bnext<CR>
 nmap <C-Down> :w<CR>G:r !gcc % -o %< && ./%<<CR>
-"
+
+" ----------------------- Trailing whitespace -----------------------
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd BufWinLeave * call clearmatches()
+
 " ------------------------- Tagbar --------------------------
 " toggle tagbar display
 map <F4> :TagbarToggle<CR>
