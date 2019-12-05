@@ -64,6 +64,10 @@ autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 autocmd BufWinLeave * call clearmatches()
 
+" ------------------------- Terminal --------------------------
+if has('nvim')
+    tnoremap <c-w> <c-\><c-n><c-w>
+endif
 " ------------------------- Tagbar --------------------------
 " toggle tagbar display
 map <F4> :TagbarToggle<CR>
@@ -125,6 +129,8 @@ if has("cscope")
 
     " show msg when any other cscope db added
     set cscopeverbose  
+    " multiple choices as quickfix
+    set cscopequickfix=s-,c-,d-,i-,t-,e- 
 
     " To do the first type of search, hit 'CTRL-\', followed by one of the
     " cscope search types above (s,g,c,t,e,f,i,d).  The result of your cscope
