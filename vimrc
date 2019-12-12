@@ -54,7 +54,9 @@ colorscheme gruvbox
 
 nmap  <C-Left> :bprevious<CR>
 nmap <C-Right>   :bnext<CR>
-nmap <C-Down> :w<CR>G:r !gcc % -o %< && ./%<<CR>
+nmap  <C-Up> :cprevious<CR>
+nmap <C-Down>   :cnext<CR>
+nmap <S-Down> :w<CR>G:r !gcc % -o %< && ./%<<CR>
 
 " ----------------------- Trailing whitespace -----------------------
 highlight ExtraWhitespace ctermbg=red guibg=red
