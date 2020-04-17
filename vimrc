@@ -1,6 +1,11 @@
 " Additional setup:
 " sudo apt-get install curl vim exuberant-ctags
 " sudo pip install pep8 flake8 pyflakes neovim neovim-remote
+if empty(glob('~/.vim/autoload/plug.vim'))
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
 set nu
 set relativenumber
@@ -18,32 +23,22 @@ set shiftwidth=4
 set scrolloff=3
 
 set nocompatible              " be iMproved, required
-filetype off                  " required
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+call plug#begin('~/.vim/bundle')
 
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" Plugons
-Plugin 'tpope/vim-fugitive'
-Plugin 'majutsushi/tagbar'
-Plugin 'lervag/vimtex'
-Plugin 'morhetz/gruvbox'
-Plugin 'ludovicchabant/vim-gutentags'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'tpope/vim-surround'
-Plugin 'Shougo/neocomplcache.vim'
-Plugin 'davidhalter/jedi-vim'
-Plugin 'scrooloose/syntastic'
+Plug 'tpope/vim-fugitive'
+Plug 'majutsushi/tagbar'
+Plug 'morhetz/gruvbox'
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'preservim/nerdcommenter'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'tpope/vim-surround'
+Plug 'itchyny/lightline.vim'
 
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
+call plug#end()
 
+let g:python3_host_prog = '~/.venv/bin/python'
 filetype plugin indent on
 filetype plugin on
 filetype indent on
@@ -77,42 +72,24 @@ map <F4> :TagbarToggle<CR>
 let g:tagbar_autofocus = 1
 
 " ------------------------- Gutentag --------------------------
-let g:gutentags_project_root = ['.root']
+let g:gutentags_project_root = ['.root', '.git']
 " generate datebases in my cache directory, prevent gtags files polluting my project
 let g:gutentags_cache_dir = expand('~/.cache/tags')
 
-" ------------------------- Vimtex --------------------------
-let g:vimtex_compiler_progname = 'nvr'
+" enable gtags module
+let g:gutentags_modules = ['ctags', 'cscope']
 
-" ------------------------ Syntastic ------------------------
-
-" show list of errors and warnings on the current file
-nmap <leader>e :Errors<CR>
-" check also when just opened the file
-let g:syntastic_check_on_open = 1
-" don't put icons on the sign column (it hides the vcs status icons of signify)
-let g:syntastic_enable_signs = 0
-
-" ------------------------ Jedi-vim --------------------------
-
-" All these mappings work only for python code:
-" Go to definition
-let g:jedi#goto_command = ',d'
-" Find ocurrences
-let g:jedi#usages_command = ',o'
-" Find assignments
-let g:jedi#goto_assignments_command = ',a'
-
-"------------------------- NeoComplCache ----------------------
-
-let g:neocomplcache_same_filetype_lists = {}
-let g:neocomplcache_same_filetype_lists._ = '_'
-
+"let g:gutentags_auto_add_cscope = 1
+let g:gutentags_cscope_build_inverted_index = 1
+let g:gutentags_file_list_command = {
+ \ 'markers': {
+     \ '.git': 'git ls-files',
+     \ '.root':'find . -type f',
+     \ },
+ \ }
 
 " --------------------------- CSCOPE --------------------------
 if has("cscope")
-
-    """"""""""""" Standard cscope/vim boilerplate
 
     " use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
     set cscopetag
@@ -122,62 +99,45 @@ if has("cscope")
     set csto=0
 
     " add any cscope database in current directory
-    if filereadable("cscope.out")
-        cs add cscope.out  
-    " else add the database pointed to by environment variable 
-    elseif $CSCOPE_DB != ""
-        cs add $CSCOPE_DB
-    endif
+    "if filereadable("cscope.out")
+        "cs add cscope.out
+    " else add the database pointed to by environment variable
+    "elseif $CSCOPE_DB != ""
+        "cs add $CSCOPE_DB
+    "endif
 
     " show msg when any other cscope db added
-    set cscopeverbose  
+    set cscopeverbose
     " multiple choices as quickfix
-    set cscopequickfix=s-,c-,d-,i-,t-,e- 
+    set cscopequickfix=s-,c-,d-,i-,t-,e-
 
     " To do the first type of search, hit 'CTRL-\', followed by one of the
     " cscope search types above (s,g,c,t,e,f,i,d).  The result of your cscope
     " search will be displayed in the current window.  You can use CTRL-T to
-    " go back to where you were before the search.  
+    " go back to where you were before the search.
 
-    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>	
+    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
     nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>	
+    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
-    " Using 'CTRL-spacebar' (intepreted as CTRL-@ by vim) then a search type
-    " makes the vim window split horizontally, with search result displayed in
-    " the new window.
-    "
-    " (Note: earlier versions of vim may not have the :scs command, but it
-    " can be simulated roughly via:
-    "    nmap <C-@>s <C-W><C-S> :cs find s <C-R>=expand("<cword>")<CR><CR>	
-
-    nmap <C-S-\>s :scs find s <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-S-\>g :scs find g <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-S-\>c :scs find c <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-S-\>t :scs find t <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-S-\>e :scs find e <C-R>=expand("<cword>")<CR><CR>	
-    nmap <C-S-\>f :scs find f <C-R>=expand("<cfile>")<CR><CR>	
-    nmap <C-S-\>i :scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>	
-    nmap <C-S-\>d :scs find d <C-R>=expand("<cword>")<CR><CR>	
-
-    " Hitting CTRL-space *twice* before the search type does a vertical 
+    " Hitting CTRL-space before the search type does a vertical
     " split instead of a horizontal one (vim 6 and up only)
     "
     " (Note: you may wish to put a 'set splitright' in your .vimrc
     " if you prefer the new window on the right instead of the left
 
-    nmap <C-S-_>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-S-_>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-S-_>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-S-_>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-S-_>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-S-_>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>	
-    nmap <C-S-_>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>	
-    nmap <C-S-_>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-space>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-space>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-space>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-space>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-space>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-space>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
+    nmap <C-space>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+    nmap <C-space>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
 
 endif
