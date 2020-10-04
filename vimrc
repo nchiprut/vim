@@ -92,11 +92,11 @@ let g:gutentags_file_list_command = {
 if has("cscope")
 
     " use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
-    set cscopetag
+    "set cscopetag
 
     " check cscope for definition of a symbol before checking ctags: set to 1
     " if you want the reverse search order.
-    set csto=0
+    "set csto=0
 
     " add any cscope database in current directory
     "if filereadable("cscope.out")
@@ -109,7 +109,7 @@ if has("cscope")
     " show msg when any other cscope db added
     set cscopeverbose
     " multiple choices as quickfix
-    set cscopequickfix=s-,c-,d-,i-,t-,e-
+    set cscopequickfix=s-,g-,c-,t-,e-,f-,i-,d-
 
     " To do the first type of search, hit 'CTRL-\', followed by one of the
     " cscope search types above (s,g,c,t,e,f,i,d).  The result of your cscope
